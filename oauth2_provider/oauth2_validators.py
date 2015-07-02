@@ -90,7 +90,7 @@ class OAuth2Validator(RequestValidator):
         Remember that this method is NOT RECOMMENDED and SHOULD be limited to clients unable to
         directly utilize the HTTP Basic authentication scheme. See rfc:`2.3.1` for more details.
         """
-        # TODO: check if oauthlib has already unquoted client_id and client_secret
+        #TODO: check if oauthlib has already unquoted client_id and client_secret
         client_id = request.client_id
         client_secret = request.client_secret
 
@@ -211,7 +211,7 @@ class OAuth2Validator(RequestValidator):
         """
         if not token:
             return False
-
+        
         try:
             access_token = AccessToken.objects.select_related("application", "user").get(
                 token=token)
@@ -293,23 +293,27 @@ class OAuth2Validator(RequestValidator):
         expires = timezone.now() + timedelta(seconds=oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS)
         if request.grant_type == 'client_credentials':
             request.user = None
+        
 
         access_token = AccessToken(
-            user=request.user,
+            user=str(request.user.pk),
             scope=token['scope'],
             expires=expires,
             token=token['access_token'],
             application=request.client)
         access_token.save()
-
+        
         if 'refresh_token' in token:
-            refresh_token = RefreshToken(
-                user=request.user,
-                token=token['refresh_token'],
-                application=request.client,
-                access_token=access_token
-            )
-            refresh_token.save()
+            try:
+                refresh_token = RefreshToken(
+                    user=str(request.user.pk),
+                    token=token['refresh_token'],
+                    application=request.client,
+                    access_token=access_token
+                )
+                refresh_token.save()
+            except Exception as e:
+                print(e)
 
         # TODO check out a more reliable way to communicate expire time to oauthlib
         token['expires_in'] = oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS

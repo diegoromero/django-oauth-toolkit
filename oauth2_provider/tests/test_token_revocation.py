@@ -47,7 +47,7 @@ class TestRevocationView(BaseTest):
         """
         tok = AccessToken.objects.create(user=self.test_user, token='1234567890',
                                          application=self.application,
-                                         expires=timezone.now() + datetime.timedelta(days=1),
+                                         expires=timezone.now()+datetime.timedelta(days=1),
                                          scope='read write')
         query_string = urlencode({
             'client_id': self.application.client_id,
@@ -66,7 +66,7 @@ class TestRevocationView(BaseTest):
         """
         tok = AccessToken.objects.create(user=self.test_user, token='1234567890',
                                          application=self.application,
-                                         expires=timezone.now() + datetime.timedelta(days=1),
+                                         expires=timezone.now()+datetime.timedelta(days=1),
                                          scope='read write')
         query_string = urlencode({
             'client_id': self.application.client_id,
@@ -85,7 +85,7 @@ class TestRevocationView(BaseTest):
         """
         tok = AccessToken.objects.create(user=self.test_user, token='1234567890',
                                          application=self.application,
-                                         expires=timezone.now() + datetime.timedelta(days=1),
+                                         expires=timezone.now()+datetime.timedelta(days=1),
                                          scope='read write')
         # invalid hint should have no effect
         query_string = urlencode({
@@ -105,7 +105,7 @@ class TestRevocationView(BaseTest):
         """
         tok = AccessToken.objects.create(user=self.test_user, token='1234567890',
                                          application=self.application,
-                                         expires=timezone.now() + datetime.timedelta(days=1),
+                                         expires=timezone.now()+datetime.timedelta(days=1),
                                          scope='read write')
         rtok = RefreshToken.objects.create(user=self.test_user, token='999999999',
                                            application=self.application, access_token=tok)
@@ -124,13 +124,12 @@ class TestRevocationView(BaseTest):
         """
         From the revocation rfc, `Section 4.1.2`_ :
 
-        If the server is unable to locate the token using the given hint,
-        it MUST extend its search across all of its supported token types
+        If the server is unable to locate the token using the given hint, it MUST extend its search across all of its supported token typeso
         .. _`Section 4.1.2`: http://tools.ietf.org/html/draft-ietf-oauth-revocation-11#section-4.1.2
         """
         tok = AccessToken.objects.create(user=self.test_user, token='1234567890',
                                          application=self.application,
-                                         expires=timezone.now() + datetime.timedelta(days=1),
+                                         expires=timezone.now()+datetime.timedelta(days=1),
                                          scope='read write')
 
         query_string = urlencode({
@@ -143,3 +142,4 @@ class TestRevocationView(BaseTest):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(AccessToken.objects.filter(id=tok.id).exists())
+

@@ -34,7 +34,6 @@ DEFAULTS = {
     'CLIENT_SECRET_GENERATOR_CLASS': 'oauth2_provider.generators.ClientSecretGenerator',
     'CLIENT_SECRET_GENERATOR_LENGTH': 128,
     'OAUTH2_VALIDATOR_CLASS': 'oauth2_provider.oauth2_validators.OAuth2Validator',
-    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.OAuthLibCore',
     'SCOPES': {"read": "Reading scope", "write": "Writing scope"},
     'READ_SCOPE': 'read',
     'WRITE_SCOPE': 'write',
@@ -53,7 +52,6 @@ MANDATORY = (
     'CLIENT_ID_GENERATOR_CLASS',
     'CLIENT_SECRET_GENERATOR_CLASS',
     'OAUTH2_VALIDATOR_CLASS',
-    'OAUTH2_BACKEND_CLASS',
     'SCOPES',
     'ALLOWED_REDIRECT_URI_SCHEMES',
 )
@@ -63,7 +61,6 @@ IMPORT_STRINGS = (
     'CLIENT_ID_GENERATOR_CLASS',
     'CLIENT_SECRET_GENERATOR_CLASS',
     'OAUTH2_VALIDATOR_CLASS',
-    'OAUTH2_BACKEND_CLASS',
 )
 
 

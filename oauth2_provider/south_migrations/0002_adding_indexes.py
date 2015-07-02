@@ -83,7 +83,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'scope': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u"%s.%s" % (ApplicationModel._meta.app_label, ApplicationModel._meta.object_name): {
             'Meta': {'object_name': ApplicationModel.__name__},
@@ -94,7 +94,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'redirect_uris': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'oauth2_provider.grant': {
             'Meta': {'object_name': 'Grant'},
@@ -104,7 +104,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'redirect_uri': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'scope': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'oauth2_provider.refreshtoken': {
             'Meta': {'object_name': 'RefreshToken'},
@@ -112,7 +112,7 @@ class Migration(SchemaMigration):
             'application': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (ApplicationModel._meta.app_label, ApplicationModel._meta.object_name)}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'token': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         }
     }
 

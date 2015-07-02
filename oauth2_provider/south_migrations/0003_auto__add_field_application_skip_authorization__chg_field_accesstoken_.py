@@ -20,25 +20,16 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'Application.skip_authorization'
-        db.add_column(u'oauth2_provider_application', 'skip_authorization',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
+        pass
 
 
-        # Changing field 'AccessToken.user'
-        db.alter_column(u'oauth2_provider_accesstoken', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['%s.%s' % (User._meta.app_label, User._meta.object_name)], null=True))
 
     def backwards(self, orm):
         # Deleting field 'Application.skip_authorization'
         db.delete_column(u'oauth2_provider_application', 'skip_authorization')
 
 
-        # User chose to not deal with backwards NULL issues for 'AccessToken.user'
-        raise RuntimeError("Cannot reverse this migration. 'AccessToken.user' and its values cannot be restored.")
 
-        # The following code is provided here to aid in writing a correct migration
-        # Changing field 'AccessToken.user'
-        db.alter_column(u'oauth2_provider_accesstoken', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['%s.%s' % (User._meta.app_label, User._meta.object_name)]))
 
     models = {
         u'auth.group': {
@@ -84,7 +75,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'scope': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']" % (User._meta.app_label, User._meta.object_name), 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u"%s.%s" % (ApplicationModel._meta.app_label, ApplicationModel._meta.object_name): {
             'Meta': {'object_name': ApplicationModel.__name__},
@@ -96,7 +87,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'redirect_uris': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'skip_authorization': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']" % (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'oauth2_provider.grant': {
             'Meta': {'object_name': 'Grant'},
@@ -106,7 +97,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'redirect_uri': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'scope': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']" % (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'oauth2_provider.refreshtoken': {
             'Meta': {'object_name': 'RefreshToken'},
@@ -114,7 +105,7 @@ class Migration(SchemaMigration):
             'application': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']"% (ApplicationModel._meta.app_label, ApplicationModel._meta.object_name)}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-        'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s.%s']" % (User._meta.app_label, User._meta.object_name)})
+        'user': ('django.db.models.fields.CharField', [], {'max_length': '100'})
     }
 }
 
