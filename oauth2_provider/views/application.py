@@ -4,8 +4,7 @@ from django.views.generic import CreateView, DetailView, DeleteView, ListView, U
 from braces.views import LoginRequiredMixin
 
 from ..forms import RegistrationForm
-from ..models import get_application_model
-
+from ..models import get_application_model, Application
 
 class ApplicationOwnerIsUserMixin(LoginRequiredMixin):
     """
@@ -14,7 +13,7 @@ class ApplicationOwnerIsUserMixin(LoginRequiredMixin):
     fields = '__all__'
 
     def get_queryset(self):
-        return get_application_model().objects.filter(user=self.request.user)
+        return Application.objects.filter(user=str(self.request.user.pk))
 
 
 class ApplicationRegistration(LoginRequiredMixin, CreateView):
@@ -25,7 +24,7 @@ class ApplicationRegistration(LoginRequiredMixin, CreateView):
     template_name = "oauth2_provider/application_registration_form.html"
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.user = str(self.request.user.pk)
         return super(ApplicationRegistration, self).form_valid(form)
 
 

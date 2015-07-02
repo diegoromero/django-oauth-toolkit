@@ -73,7 +73,6 @@ class AuthorizationView(BaseAuthorizationView, FormView):
 
     server_class = Server
     validator_class = oauth2_settings.OAUTH2_VALIDATOR_CLASS
-    oauthlib_backend_class = oauth2_settings.OAUTH2_BACKEND_CLASS
 
     skip_authorization_completely = False
 
@@ -165,7 +164,6 @@ class TokenView(CsrfExemptMixin, OAuthLibMixin, View):
     """
     server_class = Server
     validator_class = oauth2_settings.OAUTH2_VALIDATOR_CLASS
-    oauthlib_backend_class = oauth2_settings.OAUTH2_BACKEND_CLASS
 
     @method_decorator(sensitive_post_parameters('password'))
     def post(self, request, *args, **kwargs):
@@ -183,7 +181,6 @@ class RevokeTokenView(CsrfExemptMixin, OAuthLibMixin, View):
     """
     server_class = Server
     validator_class = oauth2_settings.OAUTH2_VALIDATOR_CLASS
-    oauthlib_backend_class = oauth2_settings.OAUTH2_BACKEND_CLASS
 
     def post(self, request, *args, **kwargs):
         url, headers, body, status = self.create_revocation_response(request)

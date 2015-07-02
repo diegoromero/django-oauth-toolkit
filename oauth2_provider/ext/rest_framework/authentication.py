@@ -2,6 +2,8 @@ from rest_framework.authentication import BaseAuthentication
 
 from ...oauth2_backends import get_oauthlib_core
 
+from mongoengine.django.auth import User
+
 
 class OAuth2Authentication(BaseAuthentication):
     """
@@ -17,7 +19,8 @@ class OAuth2Authentication(BaseAuthentication):
         oauthlib_core = get_oauthlib_core()
         valid, r = oauthlib_core.verify_request(request, scopes=[])
         if valid:
-            return r.user, r.access_token
+            user = User.objects.get(pk=r.user)
+            return user, r.access_token
         else:
             return None
 

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import json
-
 from oauthlib import oauth2
 from oauthlib.common import urlencode, urlencoded, quote
 
@@ -35,20 +33,10 @@ class OAuthLibCore(object):
     def _extract_params(self, request):
         """
         Extract parameters from the Django request object. Such parameters will then be passed to
-        OAuthLib to build its own Request object. The body should be encoded using OAuthLib urlencoded
+        OAuthLib to build its own Request object
         """
         uri = self._get_escaped_full_path(request)
         http_method = request.method
-        headers = self.extract_headers(request)
-        body = urlencode(self.extract_body(request))
-        return uri, http_method, body, headers
-
-    def extract_headers(self, request):
-        """
-        Extracts headers from the Django request object
-        :param request: The current django.http.HttpRequest object
-        :return: a dictionary with OAuthLib needed headers
-        """
         headers = request.META.copy()
         if 'wsgi.input' in headers:
             del headers['wsgi.input']
@@ -56,16 +44,8 @@ class OAuthLibCore(object):
             del headers['wsgi.errors']
         if 'HTTP_AUTHORIZATION' in headers:
             headers['Authorization'] = headers['HTTP_AUTHORIZATION']
-
-        return headers
-
-    def extract_body(self, request):
-        """
-        Extracts the POST body from the Django request object
-        :param request: The current django.http.HttpRequest object
-        :return: provided POST parameters
-        """
-        return request.POST.items()
+        body = urlencode(request.POST.items())
+        return uri, http_method, body, headers
 
     def validate_authorization_request(self, request):
         """
@@ -121,11 +101,12 @@ class OAuthLibCore(object):
         :param request: The current django.http.HttpRequest object
         """
         uri, http_method, body, headers = self._extract_params(request)
-
+        
         headers, body, status = self.server.create_token_response(uri, http_method, body,
                                                                   headers)
+        print(self.server)
         uri = headers.get("Location", None)
-
+        
         return uri, headers, body, status
 
     def create_revocation_response(self, request):
@@ -151,27 +132,9 @@ class OAuthLibCore(object):
         :param scopes: A list of scopes required to verify so that request is verified
         """
         uri, http_method, body, headers = self._extract_params(request)
-
+        
         valid, r = self.server.verify_request(uri, http_method, body, headers, scopes=scopes)
         return valid, r
-
-
-class JSONOAuthLibCore(OAuthLibCore):
-    """
-    Extends the default OAuthLibCore to parse correctly requests with application/json Content-Type
-    """
-    def extract_body(self, request):
-        """
-        Extracts the JSON body from the Django request object
-        :param request: The current django.http.HttpRequest object
-        :return: provided POST parameters "urlencodable"
-        """
-        try:
-            body = json.loads(request.body.decode('utf-8')).items()
-        except ValueError:
-            body = ""
-
-        return body
 
 
 def get_oauthlib_core():
@@ -182,4 +145,4 @@ def get_oauthlib_core():
     from oauthlib.oauth2 import Server
 
     server = Server(oauth2_settings.OAUTH2_VALIDATOR_CLASS())
-    return oauth2_settings.OAUTH2_BACKEND_CLASS(server)
+    return OAuthLibCore(server)

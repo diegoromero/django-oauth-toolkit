@@ -55,7 +55,7 @@ class AbstractApplication(models.Model):
 
     client_id = models.CharField(max_length=100, unique=True,
                                  default=generate_client_id, db_index=True)
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name="%(app_label)s_%(class)s")
+    user = models.CharField(max_length=100)
     help_text = _("Allowed URIs list, space separated")
     redirect_uris = models.TextField(help_text=help_text,
                                      validators=[validate_uris], blank=True)
@@ -68,6 +68,7 @@ class AbstractApplication(models.Model):
     skip_authorization = models.BooleanField(default=False)
 
     class Meta:
+        app_label = 'auth'
         abstract = True
 
     @property
@@ -94,8 +95,8 @@ class AbstractApplication(models.Model):
             parsed_uri = urlparse(uri)
 
             if (parsed_allowed_uri.scheme == parsed_uri.scheme and
-                    parsed_allowed_uri.netloc == parsed_uri.netloc and
-                    parsed_allowed_uri.path == parsed_uri.path):
+                parsed_allowed_uri.netloc == parsed_uri.netloc and
+                parsed_allowed_uri.path == parsed_uri.path):
 
                 aqs_set = set(parse_qsl(parsed_allowed_uri.query))
                 uqs_set = set(parse_qsl(parsed_uri.query))
@@ -122,7 +123,8 @@ class AbstractApplication(models.Model):
 
 
 class Application(AbstractApplication):
-    pass
+    class Meta:
+        app_label = 'auth'
 
 # Add swappable like this to not break django 1.4 compatibility
 Application._meta.swappable = 'OAUTH2_PROVIDER_APPLICATION_MODEL'
@@ -144,12 +146,15 @@ class Grant(models.Model):
     * :attr:`redirect_uri` Self explained
     * :attr:`scope` Required scopes, optional
     """
-    user = models.ForeignKey(AUTH_USER_MODEL)
+    user = models.CharField(max_length=100)
     code = models.CharField(max_length=255, db_index=True)  # code comes from oauthlib
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL)
     expires = models.DateTimeField()
     redirect_uri = models.CharField(max_length=255)
     scope = models.TextField(blank=True)
+    
+    class Meta:
+        app_label = 'grant'
 
     def is_expired(self):
         """
@@ -179,11 +184,14 @@ class AccessToken(models.Model):
                       :data:`settings.ACCESS_TOKEN_EXPIRE_SECONDS`
     * :attr:`scope` Allowed scopes
     """
-    user = models.ForeignKey(AUTH_USER_MODEL, blank=True, null=True)
+    user = models.CharField(max_length=100, blank=True, null=True)
     token = models.CharField(max_length=255, db_index=True)
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL)
+    application = models.ForeignKey(Application)
     expires = models.DateTimeField()
     scope = models.TextField(blank=True)
+    
+    class Meta:
+        app_label = 'access_token'
 
     def is_valid(self, scopes=None):
         """
@@ -216,7 +224,6 @@ class AccessToken(models.Model):
     def __str__(self):
         return self.token
 
-
 @python_2_unicode_compatible
 class RefreshToken(models.Model):
     """
@@ -231,11 +238,14 @@ class RefreshToken(models.Model):
     * :attr:`access_token` AccessToken instance this refresh token is
                            bounded to
     """
-    user = models.ForeignKey(AUTH_USER_MODEL)
+    user = models.CharField(max_length=100)
     token = models.CharField(max_length=255, db_index=True)
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL)
     access_token = models.OneToOneField(AccessToken,
                                         related_name='refresh_token')
+                                        
+    class Meta:
+        app_label = 'refresh_token'
 
     def __str__(self):
         return self.token
@@ -243,13 +253,5 @@ class RefreshToken(models.Model):
 
 def get_application_model():
     """ Return the Application model that is active in this project. """
-    try:
-        app_label, model_name = oauth2_settings.APPLICATION_MODEL.split('.')
-    except ValueError:
-        e = "APPLICATION_MODEL must be of the form 'app_label.model_name'"
-        raise ImproperlyConfigured(e)
-    app_model = get_model(app_label, model_name)
-    if app_model is None:
-        e = "APPLICATION_MODEL refers to model {0} that has not been installed"
-        raise ImproperlyConfigured(e.format(oauth2_settings.APPLICATION_MODEL))
-    return app_model
+
+    return Application

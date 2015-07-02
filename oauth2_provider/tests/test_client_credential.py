@@ -14,7 +14,6 @@ from django.views.generic import View
 from oauthlib.oauth2 import BackendApplicationServer
 
 from ..models import get_application_model, AccessToken
-from ..oauth2_backends import OAuthLibCore
 from ..oauth2_validators import OAuth2Validator
 from ..settings import oauth2_settings
 from ..views import ProtectedResourceView
@@ -115,7 +114,6 @@ class TestExtendedRequest(BaseTest):
         class TestView(OAuthLibMixin, View):
             server_class = BackendApplicationServer
             validator_class = OAuth2Validator
-            oauthlib_backend_class = OAuthLibCore
 
             def get_scopes(self):
                 return ['read', 'write']
@@ -168,10 +166,7 @@ class TestClientResourcePasswordBased(BaseTest):
             'username': 'test_user',
             'password': '123456'
         }
-        auth_headers = self.get_basic_auth_header(
-            urllib.quote_plus(self.application.client_id),
-            urllib.quote_plus(self.application.client_secret))
-
+        auth_headers = self.get_basic_auth_header(urllib.quote_plus(self.application.client_id), urllib.quote_plus(self.application.client_secret))
         response = self.client.post(reverse('oauth2_provider:token'), data=token_request_data, **auth_headers)
         self.assertEqual(response.status_code, 200)
 
@@ -188,3 +183,5 @@ class TestClientResourcePasswordBased(BaseTest):
         view = ResourceView.as_view()
         response = view(request)
         self.assertEqual(response, "This is a protected resource")
+
+
