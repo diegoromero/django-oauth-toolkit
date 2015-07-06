@@ -47,10 +47,10 @@ class AbstractApplication(models.Model):
     GRANT_PASSWORD = 'password'
     GRANT_CLIENT_CREDENTIALS = 'client-credentials'
     GRANT_TYPES = (
-        (GRANT_AUTHORIZATION_CODE, _('Authorization code')),
-        (GRANT_IMPLICIT, _('Implicit')),
+        #(GRANT_AUTHORIZATION_CODE, _('Authorization code')),
+        #(GRANT_IMPLICIT, _('Implicit')),
         (GRANT_PASSWORD, _('Resource owner password-based')),
-        (GRANT_CLIENT_CREDENTIALS, _('Client credentials')),
+        #(GRANT_CLIENT_CREDENTIALS, _('Client credentials')),
     )
 
     client_id = models.CharField(max_length=100, unique=True,

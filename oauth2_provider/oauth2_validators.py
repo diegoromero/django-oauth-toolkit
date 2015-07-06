@@ -14,6 +14,8 @@ from .compat import unquote_plus
 from .models import Grant, AccessToken, RefreshToken, get_application_model, AbstractApplication
 from .settings import oauth2_settings
 
+from mongoengine.django.auth import User
+
 log = logging.getLogger('oauth2_provider')
 
 GRANT_TYPE_MAPPING = {
@@ -217,7 +219,7 @@ class OAuth2Validator(RequestValidator):
                 token=token)
             if access_token.is_valid(scopes):
                 request.client = access_token.application
-                request.user = access_token.user
+                request.user = User.objects.get(pk=access_token.user)
                 request.scopes = scopes
 
                 # this is needed by django rest framework
@@ -232,7 +234,7 @@ class OAuth2Validator(RequestValidator):
             grant = Grant.objects.get(code=code, application=client)
             if not grant.is_expired():
                 request.scopes = grant.scope.split(' ')
-                request.user = grant.user
+                request.user = User.objects.get(pk=grant.user)
                 return True
             return False
 
@@ -273,7 +275,7 @@ class OAuth2Validator(RequestValidator):
     def save_authorization_code(self, client_id, code, request, *args, **kwargs):
         expires = timezone.now() + timedelta(
             seconds=oauth2_settings.AUTHORIZATION_CODE_EXPIRE_SECONDS)
-        g = Grant(application=request.client, user=request.user, code=code['code'],
+        g = Grant(application=request.client, user=str(request.user.pk), code=code['code'],
                   expires=expires, redirect_uri=request.redirect_uri,
                   scope=' '.join(request.scopes))
         g.save()
@@ -313,7 +315,7 @@ class OAuth2Validator(RequestValidator):
                 )
                 refresh_token.save()
             except Exception as e:
-                print(e)
+                pass
 
         # TODO check out a more reliable way to communicate expire time to oauthlib
         token['expires_in'] = oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS
@@ -365,7 +367,7 @@ class OAuth2Validator(RequestValidator):
         """
         try:
             rt = RefreshToken.objects.get(token=refresh_token)
-            request.user = rt.user
+            request.user = User.objects.get(pk=rt.user)
             request.refresh_token = rt.token
             # Temporary store RefreshToken instance to be reused by get_original_scopes.
             request.refresh_token_instance = rt

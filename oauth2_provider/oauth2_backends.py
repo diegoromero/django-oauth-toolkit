@@ -104,7 +104,6 @@ class OAuthLibCore(object):
         
         headers, body, status = self.server.create_token_response(uri, http_method, body,
                                                                   headers)
-        print(self.server)
         uri = headers.get("Location", None)
         
         return uri, headers, body, status
