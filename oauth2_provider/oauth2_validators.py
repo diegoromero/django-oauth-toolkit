@@ -207,8 +207,11 @@ class OAuth2Validator(RequestValidator):
     def get_default_redirect_uri(self, client_id, request, *args, **kwargs):
         return request.client.default_redirect_uri
 
+        
     def validate_bearer_token(self, token, scopes, request):
-        print('token: ' + token)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error('token: ' + token)
         """
         When users try to access resources, check that provided token is valid
         """
@@ -220,7 +223,7 @@ class OAuth2Validator(RequestValidator):
                 token=token)
             
             if access_token.is_valid(scopes):
-                print('access_token is valid')
+                logger.error('access_token is valid')
                 request.client = access_token.application
                 request.user = User.objects.get(pk=access_token.user)
                 request.scopes = scopes
@@ -230,10 +233,10 @@ class OAuth2Validator(RequestValidator):
                 return True
             return False
         except AccessToken.DoesNotExist as e:
-            print(e)
+            logger.error(e)
             return False
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def validate_code(self, client_id, code, client, request, *args, **kwargs):
         try:
